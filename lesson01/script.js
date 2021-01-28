@@ -5,3 +5,6 @@ const addExpenses = null;
 const deposit = null;
 const mission = null;
 const period = null;
+
+// модальное окно (alert)
+alert('Превед');
