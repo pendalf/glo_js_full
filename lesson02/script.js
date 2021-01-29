@@ -1,10 +1,10 @@
 // Переменные
-const money = null;
-const income = null;
-const addExpenses = null;
-const deposit = null;
-const mission = null;
-const period = null;
+const money = 200000;
+const income = 'зарплата';
+const addExpenses = 'интернет, такси, коммуналка, ипотека';
+const deposit = false;
+const mission = 2000000;
+const period = 12;
 
 // модальное окно (alert)
 alert('Превед');
