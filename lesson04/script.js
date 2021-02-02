@@ -1,9 +1,9 @@
 'use strict';
 
 // Спрашиваем у пользователя “Ваш месячный доход?” и результат сохраняем в переменную money
-const moneyPromt = (repeat = false, incorrect = 'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.', correct = 'Ваш месячный доход?') => {
+const moneyPromt = (repeat = false, incorrect = 'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.', correct = 'Ваш месячный доход?', defValue = 210000) => {
     const promtText = repeat ? incorrect : correct;
-    let money = Number(prompt(promtText));
+    let money = Number(prompt(promtText, defValue));
     if (!money) {
         money = moneyPromt(true, incorrect, correct);
     }
@@ -13,7 +13,7 @@ const money = moneyPromt();
 const income = 'зарплата';
 
 // Спросить у пользователя “Перечислите возможные расходы за рассчитываемый период через запятую” сохранить в переменную addExpenses (пример: "Квартплата, проездной, кредит")
-const addExpenses = prompt('Перечислите возможные расходы за рассчитываемый период через запятую');
+const addExpenses = prompt('Перечислите возможные расходы за рассчитываемый период через запятую', 'ипотека, питание');
 
 // Спросить у пользователя “Есть ли у вас депозит в банке?” и сохранить данные в переменной deposit (булево значение true/false)
 const deposit = confirm('Есть ли у Вас депозит в банке?');
@@ -26,39 +26,44 @@ const period = 12;
     “Во сколько это обойдется?” (например amount1, amount2)
 в итоге 4 вопроса и 4 разные переменных
 */
-const expenses1 = prompt('Введите обязательную статью расходов');
-const amount1 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses1 + '" обойдутся.', 'Во сколько это обойдется.');
-const expenses2 = prompt('Введите обязательную статью расходов');
-const amount2 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses2 + '" обойдутся.', 'Во сколько это обойдется.');
+const expenses1 = prompt('Введите обязательную статью расходов', 'Ипотека');
+const amount1 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses1 + '" обойдутся.', 'Во сколько это обойдется.', 20000);
+const expenses2 = prompt('Введите обязательную статью расходов', 'Питание');
+const amount2 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses2 + '" обойдутся.', 'Во сколько это обойдется.', 10000);
 
 // вывод сообщений в консоль
 
 // Вывести в консоль тип данных значений переменных money, income, deposit;
-console.log(typeof money);
-console.log(typeof income);
-console.log(typeof deposit);
-
-// Вывести в консоль длину строки addExpenses
-console.log(addExpenses.length);
-
-// Вывести в консоль “Период равен (period) месяцев” и “Цель заработать (mission) рублей/долларов/гривен/юани”
-console.log('Период равен ' + period + ' месяцев');
-console.log('Цель заработать ' + mission + ' рублей');
+const showTypeOf = data => {
+    console.log(typeof(data));
+};
+showTypeOf(money);
+showTypeOf(income);
+showTypeOf(deposit);
 
 // Привести строку addExpenses к нижнему регистру и разбить строку на массив, вывести массив в консоль
 const addExpensesArr = addExpenses.toLowerCase().split(',').map((elem) => elem.trim());
 console.log(addExpensesArr);
 
-// Вычислить бюджет на месяц, учитывая обязательные расходы, сохранить в новую переменную budgetMonth и вывести результат в консоль
-const budgetMonth = amount1 + amount2;
-console.log('Бюджет на месяц:' + budgetMonth);
+// Объявить функцию getExpensesMonth. Функция возвращает сумму всех обязательных расходов за месяц
+const getExpensesMonth = () => amount1 + amount2;
+console.log('Бюджет на месяц:' + getExpensesMonth());
+
+// Объявить функцию getAccumulatedMonth. Функция возвращает Накопления за месяц (Доходы минус расходы)
+const getAccumulatedMonth = () => money - getExpensesMonth();
+
+// Объявить переменную accumulatedMonth и присвоить ей результат вызова функции getAccumulatedMonth 
+const accumulatedMonth = getAccumulatedMonth();
+
+// Объявить функцию getTargetMonth. Подсчитывает за какой период будет достигнута цель, зная результат месячного накопления (accumulatedMonth) и возвращает результат
+const getTargetMonth = () => Math.ceil(mission / accumulatedMonth);
 
 // Зная budgetMonth, посчитать за сколько месяцев будет достигнута цель mission, вывести в консоль, округляя в большую сторону (методы объекта Math в помощь)
-console.log(`Цель будет достигнута за ${Math.ceil(mission / (money - budgetMonth))} месяцев.`);
+console.log(`Цель будет достигнута за ${getTargetMonth()} месяцев.`);
 
 // Объявить переменную budgetDay и присвоить дневной бюджет (доход за месяц / 30)
 // Поправить budgetDay учитывая бюджет на месяц, а не месячный доход. Вывести в консоль  округлив в меньшую сторону
-const budgetDay = Math.floor((money - budgetMonth) / 30);
+const budgetDay = Math.floor(accumulatedMonth / 30);
 console.log(`Бюджет на день: ${budgetDay}`);
 
 /*
@@ -70,13 +75,16 @@ console.log(`Бюджет на день: ${budgetDay}`);
     Если отрицательное значение то вывести “Что то пошло не так”
     Учесть варианты 0, 600 и 1200 (к какому уровню не важно)
 */
+const getStatusIncome = function() {
+    if (budgetDay >= 1200) {
+        return 'У вас высокий уровень дохода';
+    } else if (budgetDay >= 600 && budgetDay < 1200) {
+        return 'У вас средний уровень дохода';
+    } else if (budgetDay >= 0 && budgetDay < 600) {
+        return 'К сожалению у вас уровень дохода ниже среднего';
+    } else {
+        return 'Что то пошло не так';
+    }
+};
 
-if (budgetDay >= 1200) {
-    console.log('У вас высокий уровень дохода');
-} else if (budgetDay >= 600 && budgetDay < 1200) {
-    console.log('У вас средний уровень дохода');
-} else if (budgetDay >= 0 && budgetDay < 600) {
-    console.log('К сожалению у вас уровень дохода ниже среднего');
-} else {
-    console.log('Что то пошло не так');
-}
+console.log(getStatusIncome());
