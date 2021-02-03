@@ -10,10 +10,8 @@ const moneyPromt = (repeat = false, incorrect = 'Вы ввели некооре�
     let money = prompt(promtText, defValue);
     if (!isNumber(money)) {
         money = moneyPromt(true, incorrect, correct, defValue);
-    } else {
-        money = +money.trim();
     }
-    return money;
+    return +money;
 };
 let money;
 const income = 'зарплата';
