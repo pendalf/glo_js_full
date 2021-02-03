@@ -7,14 +7,26 @@ let isNumber = function(n) {
 
 const moneyPromt = (repeat = false, incorrect = 'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.', correct = 'Ваш месячный доход?', defValue = 210000) => {
     const promtText = repeat ? incorrect : correct;
-    let money = Number(prompt(promtText, defValue).trim());
-    if (!money) {
+    let money = prompt(promtText, defValue);
+    if (!isNumber(money)) {
         money = moneyPromt(true, incorrect, correct, defValue);
+    } else {
+        money = +money.trim();
     }
     return money;
 };
 let money;
 const income = 'зарплата';
+
+// Функция start из практического занятия
+let start = function() {
+
+    do {
+        money = moneyPromt();
+    } while (!isNumber(money));
+};
+
+start();
 
 // Спросить у пользователя “Перечислите возможные расходы за рассчитываемый период через запятую” сохранить в переменную addExpenses (пример: "Квартплата, проездной, кредит")
 const addExpenses = prompt('Перечислите возможные расходы за рассчитываемый период через запятую', 'ипотека, питание');
@@ -36,15 +48,6 @@ const period = 12;
 // const amount2 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses2 + '" обойдутся.', 'Во сколько это обойдется.', 10000);
 
 // вывод сообщений в консоль
-
-let start = function() {
-
-    while (!isNumber(money)) {
-        money = moneyPromt();
-    }
-};
-
-start();
 
 // Вывести в консоль тип данных значений переменных money, income, deposit;
 const showTypeOf = data => {
@@ -111,7 +114,7 @@ const getStatusIncome = function() {
     } else if (budgetDay >= 0 && budgetDay < 600) {
         return 'К сожалению у вас уровень дохода ниже среднего';
     } else {
-        return 'Что то пошло не так';
+        return 'Цель не будет достигнута';
     }
 };
 
