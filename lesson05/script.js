@@ -1,15 +1,19 @@
 'use strict';
 
 // Спрашиваем у пользователя “Ваш месячный доход?” и результат сохраняем в переменную money
+let isNumber = function(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+};
+
 const moneyPromt = (repeat = false, incorrect = 'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.', correct = 'Ваш месячный доход?', defValue = 210000) => {
     const promtText = repeat ? incorrect : correct;
-    let money = Number(prompt(promtText, defValue));
+    let money = Number(prompt(promtText, defValue).trim());
     if (!money) {
-        money = moneyPromt(true, incorrect, correct);
+        money = moneyPromt(true, incorrect, correct, defValue);
     }
     return money;
 };
-const money = moneyPromt();
+let money;
 const income = 'зарплата';
 
 // Спросить у пользователя “Перечислите возможные расходы за рассчитываемый период через запятую” сохранить в переменную addExpenses (пример: "Квартплата, проездной, кредит")
@@ -26,12 +30,21 @@ const period = 12;
     “Во сколько это обойдется?” (например amount1, amount2)
 в итоге 4 вопроса и 4 разные переменных
 */
-const expenses1 = prompt('Введите обязательную статью расходов', 'Ипотека');
-const amount1 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses1 + '" обойдутся.', 'Во сколько это обойдется.', 20000);
-const expenses2 = prompt('Введите обязательную статью расходов', 'Питание');
-const amount2 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses2 + '" обойдутся.', 'Во сколько это обойдется.', 10000);
+// const expenses1 = prompt('Введите обязательную статью расходов', 'Ипотека');
+// const amount1 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses1 + '" обойдутся.', 'Во сколько это обойдется.', 20000);
+// const expenses2 = prompt('Введите обязательную статью расходов', 'Питание');
+// const amount2 = moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "' + expenses2 + '" обойдутся.', 'Во сколько это обойдется.', 10000);
 
 // вывод сообщений в консоль
+
+let start = function() {
+
+    while (!isNumber(money)) {
+        money = moneyPromt();
+    }
+};
+
+start();
 
 // Вывести в консоль тип данных значений переменных money, income, deposit;
 const showTypeOf = data => {
@@ -46,11 +59,26 @@ const addExpensesArr = addExpenses.toLowerCase().split(',').map((elem) => elem.t
 console.log(addExpensesArr);
 
 // Объявить функцию getExpensesMonth. Функция возвращает сумму всех обязательных расходов за месяц
-const getExpensesMonth = () => amount1 + amount2;
-console.log('Бюджет на месяц:' + getExpensesMonth());
+const getExpensesMonth = () => {
+    let sum = 0;
+    let expenses1, expenses2;
+    for (let i = 0; i < 2; i++) {
+        if (i === 0) {
+            expenses1 = prompt('Введите обязательную статью расходов', 'Ипотека');
+        } else if (i === 1) {
+            expenses2 = prompt('Введите обязательную статью расходов', 'Питание');
+        }
+
+        sum += moneyPromt(false, 'Вы ввели некооректное значение. Укажите числом во сколько расходы по этой статье обойдутся.', 'Во сколько это обойдется.', '');
+
+    }
+    return sum;
+};
+const expensesMonth = getExpensesMonth();
+console.log('Бюджет на месяц:' + expensesMonth);
 
 // Объявить функцию getAccumulatedMonth. Функция возвращает Накопления за месяц (Доходы минус расходы)
-const getAccumulatedMonth = () => money - getExpensesMonth();
+const getAccumulatedMonth = () => money - expensesMonth;
 
 // Объявить переменную accumulatedMonth и присвоить ей результат вызова функции getAccumulatedMonth 
 const accumulatedMonth = getAccumulatedMonth();
