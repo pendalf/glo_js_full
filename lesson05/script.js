@@ -56,7 +56,7 @@ showTypeOf(income);
 showTypeOf(deposit);
 
 // Привести строку addExpenses к нижнему регистру и разбить строку на массив, вывести массив в консоль
-const addExpensesArr = addExpenses.toLowerCase().split(',').map((elem) => elem.trim());
+const addExpensesArr = addExpenses ? addExpenses.toLowerCase().split(',').map((elem) => elem.trim()) : false;
 console.log(addExpensesArr);
 
 // Объявить функцию getExpensesMonth. Функция возвращает сумму всех обязательных расходов за месяц
