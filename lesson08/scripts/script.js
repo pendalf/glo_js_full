@@ -1,26 +1,54 @@
 'use strict';
 
-// Спрашиваем у пользователя “Ваш месячный доход?” и результат сохраняем в переменную money
 let isNumber = function(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 };
 
-// Функция опроса ползователя для получения числа
-const moneyPromt = (repeat = false, incorrect = 'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.', correct = 'Ваш месячный доход?', defValue = 210000) => {
+// Функция опроса ползователя.
+const askUser = (type, correct, incorrect, defValue = '', repeat = false) => {
     const promtText = repeat ? incorrect : correct;
-    let money = prompt(promtText, defValue);
-    if (!isNumber(money)) {
-        money = moneyPromt(true, incorrect, correct, defValue);
+    let text = prompt(promtText, defValue);
+
+    switch (type) {
+        case Number:
+            text = !isNumber(text) ? askUser(type, correct, incorrect, defValue, true) : +text;
+
+            break;
+        case String:
+            text = isNumber(text) || text === null ? askUser(type, correct, incorrect, defValue, true) : text;
+
+            break;
+
+        default:
+            break;
     }
-    return +money;
+
+    return text;
 };
+
+// Функция для 
+const capitalizeFirstLetter = function(string) {
+    if (!string) {
+        return string;
+    }
+    return string[0].toUpperCase() + string.slice(1);
+};
+
+
 let money;
+
+
 
 // Функция start из практического занятия
 let start = function() {
 
     do {
-        money = moneyPromt();
+        money = askUser(
+            Number,
+            'Ваш месячный доход?',
+            'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.',
+            210000
+        );
     } while (!isNumber(money));
 };
 
@@ -32,6 +60,8 @@ let appData = {
     expenses: {},
     addExpenses: [],
     deposit: false,
+    percentDeposit: 0,
+    moneyDeposit: 0,
     mission: 2000000,
     period: 12,
     budget: money,
@@ -40,6 +70,22 @@ let appData = {
     expensesMonth: 0,
     // Метод asking производит опрос пользователя 
     asking: function() {
+        if (confirm('Есть ли у Вас дополнительный источник заработка?')) {
+            let itemIncome = askUser(
+                String,
+                'Какой у Вас дополнительный заработок?',
+                'Вы ввели число. Укажите наименование Вашего дополнительного заработка текстом.',
+                'Таксую'
+            );
+            let cashIncome = askUser(
+                Number,
+                'Сколько в месяц Вы зарабатываете на этом?',
+                'Вы ввели некооректное значение. Укажите числом сколько в месяц Вы зарабатываете на этом.',
+                10000
+            );
+
+            appData.addIncome[itemIncome] = +cashIncome;
+        }
         // Запрос у пользователя о возможных обязательных статьях расхода
         const addExpenses = prompt('Перечислите возможные расходы за рассчитываемый период через запятую', 'ипотека, питание');
 
@@ -51,8 +97,18 @@ let appData = {
 
         // Опрос пользователя по размерам обязательных статей расхода
         for (let i = 0; i < 2; i++) {
-            let expenses = prompt('Введите обязательную статью расходов');
-            appData.expenses[expenses] = moneyPromt(false, `Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "${expenses}" обойдутся.`, 'Во сколько это обойдется.', '');
+            let expenses = askUser(
+                String,
+                'Введите обязательную статью расходов',
+                'Вы ввели число. Укажите наименование обязательной статьи расходов.',
+                'Ипотека'
+            );
+            appData.expenses[expenses] = askUser(
+                Number,
+                'Во сколько это обойдется.',
+                `Вы ввели некооректное значение. Укажите числом во сколько расходы по статье "${expenses}" обойдутся.`,
+                1000
+            );
         }
     },
     // Метод getExpensesMonth возвращает сумму всех обязательных расходов за месяц
@@ -81,6 +137,25 @@ let appData = {
         } else {
             return 'Цель не будет достигнута';
         }
+    },
+    getInfoDeposit: function() {
+        if (appData.deposit) {
+            appData.percentDeposit = askUser(
+                Number,
+                'Какой годовой процент?',
+                `Вы ввели некооректное значение. Укажите числом годовой процент.`,
+                10
+            );
+            appData.moneyDeposit = askUser(
+                Number,
+                'Какая сумма заложена?',
+                `Вы ввели некооректное значение. Укажите числом какая сумма заложена.`,
+                10000
+            );
+        }
+    },
+    calcSavedMoney: function() {
+        return appData.budgetMonth * appData.period;
     }
 };
 
@@ -99,3 +174,5 @@ for (const key in appData) {
 
     }
 }
+
+console.log(appData.addExpenses.map((item) => capitalizeFirstLetter(item)).join(', '));
