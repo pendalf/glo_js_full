@@ -26,7 +26,7 @@ const askUser = (type, correct, incorrect, defValue = '', repeat = false) => {
     return text;
 };
 
-// Функция для 
+// Функция для получения фразы с первой заглавной буквы
 const capitalizeFirstLetter = function(string) {
     if (!string) {
         return string;
@@ -51,6 +51,43 @@ let start = function() {
         );
     } while (!isNumber(money));
 };
+
+// получить каждый элемент в отдельную переменную:
+
+// Кнопку "Рассчитать" через id
+const сalculate = document.getElementById('start');
+
+// Кнопки “+” (плюс) через Tag, каждую в своей переменной. 
+const buttonIncomeAdd = document.getElementsByTagName('button')[0];
+const buttonExpensesAdd = document.getElementsByTagName('button')[1];
+
+// Чекбокс по id через querySelector
+const depositCheck = document.querySelector('#deposit-check');
+
+// Поля для ввода возможных доходов (additional_income-item) при помощи querySelectorAll
+const additionalIncomeItem = document.querySelectorAll('.additional_income-item');
+
+// Каждый элемент в правой части программы через класс(не через querySelector), которые имеют в имени класса "-value", начиная с class="budget_day-value" и заканчивая class="target_month-value">
+const budgetDayValue = document.getElementsByClassName('budget_day-value')[0];
+const expensesMonthValue = document.getElementsByClassName('expenses_month-value')[0];
+const additionalIncomeValue = document.getElementsByClassName('additional_income-value')[0];
+const additionalExpensesValue = document.getElementsByClassName('additional_expenses-value')[0];
+const incomePeriodValue = document.getElementsByClassName('income_period-value')[0];
+const targetMonthValue = document.getElementsByClassName('target_month-value')[0];
+
+// Оставшиеся поля через querySelector каждый в отдельную переменную:
+const budgetMonthValue = document.querySelector('.budget_month-value');
+
+// поля ввода (input) с левой стороны и не забудьте про range.
+const salaryAmount = document.querySelector('.salary-amount');
+const incomeTitle = document.querySelector('.income-title');
+const incomeAmount = document.querySelector('.income-amount');
+const expensesTitle = document.querySelector('.expenses-title');
+const expensesAmount = document.querySelector('.expenses-amount');
+const additionalExpensesItem = document.querySelector('.additional_expenses-item');
+const targetAmount = document.querySelector('.target-amount');
+const periodSelect = document.querySelector('.period-select');
+
 
 start();
 
@@ -162,6 +199,7 @@ let appData = {
 appData.asking();
 appData.getExpensesMonth();
 appData.getBudget();
+appData.getInfoDeposit();
 
 console.log('Бюджет на месяц:' + appData.expensesMonth);
 console.log(`Цель будет достигнута за ${appData.getTargetMonth()} месяцев.`);
