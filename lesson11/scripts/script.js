@@ -103,6 +103,7 @@ let appData = {
     // Метод добавления полей обязательных расходов
     addExpensesBlock: function() {
         const cloneExpensesItem = expensesItems[0].cloneNode(true);
+        cloneExpensesItem.querySelectorAll('input').forEach(item => item.value = '');
         expensesPlus.before(cloneExpensesItem);
         expensesItems = document.querySelectorAll('.expenses-items');
         if (expensesItems.length === 3) {
@@ -112,6 +113,7 @@ let appData = {
     // Метод добавления полей обязательных расходов
     addIncomeBlock: function() {
         const cloneIncomeItems = incomeItems[0].cloneNode(true);
+        cloneIncomeItems.querySelectorAll('input').forEach(item => item.value = '');
         incomePlus.before(cloneIncomeItems);
         incomeItems = document.querySelectorAll('.income-items');
         if (incomeItems.length === 3) {
@@ -234,6 +236,22 @@ incomePlus.addEventListener('click', appData.addIncomeBlock);
 
 periodSelect.addEventListener('input', (event) => {
     periodSelect.nextElementSibling.textContent = event.target.value;
+});
+
+document.querySelectorAll('[placeholder = "Наименование"]').forEach(item => {
+    item.addEventListener('input', event => {
+        if (!/[а-яА-Я\s\W]/.test(event.target.value.slice(-1))) {
+            event.target.value = event.target.value.slice(0, -1)
+        }
+    });
+});
+
+document.querySelectorAll('[placeholder = "Сумма"]').forEach(item => {
+    item.addEventListener('input', event => {
+        if (!/[\d]/.test(event.target.value.slice(-1))) {
+            event.target.value = event.target.value.slice(0, -1)
+        }
+    });
 });
 
 
