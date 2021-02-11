@@ -1,59 +1,8 @@
 'use strict';
 
-let isNumber = function(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-};
-
-// Функция опроса ползователя.
-const askUser = (type, correct, incorrect, defValue = '', repeat = false) => {
-    const promtText = repeat ? incorrect : correct;
-    let text = prompt(promtText, defValue);
-
-    switch (type) {
-        case Number:
-            text = !isNumber(text) ? askUser(type, correct, incorrect, defValue, true) : +text;
-
-            break;
-        case String:
-            text = isNumber(text) || text === null ? askUser(type, correct, incorrect, defValue, true) : text;
-
-            break;
-
-        default:
-            break;
-    }
-
-    return text;
-};
-
-// Функция для получения фразы с первой заглавной буквы
-const capitalizeFirstLetter = function(string) {
-    if (!string) {
-        return string;
-    }
-    return string[0].toUpperCase() + string.slice(1);
-};
-
-
 let money;
 
-
-
-// Функция start из практического занятия
-let start = function() {
-
-    do {
-        money = askUser(
-            Number,
-            'Ваш месячный доход?',
-            'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.',
-            210000
-        );
-    } while (!isNumber(money));
-};
-
 // получить каждый элемент в отдельную переменную:
-
 // Кнопку "Рассчитать" через id
 const сalculate = document.getElementById('start');
 
@@ -89,7 +38,39 @@ const targetAmount = document.querySelector('.target-amount');
 const periodSelect = document.querySelector('.period-select');
 
 
-start();
+let isNumber = function(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+};
+
+// Функция опроса ползователя.
+const askUser = (type, correct, incorrect, defValue = '', repeat = false) => {
+    const promtText = repeat ? incorrect : correct;
+    let text = prompt(promtText, defValue);
+
+    switch (type) {
+        case Number:
+            text = !isNumber(text) ? askUser(type, correct, incorrect, defValue, true) : +text;
+
+            break;
+        case String:
+            text = isNumber(text) || text === null ? askUser(type, correct, incorrect, defValue, true) : text;
+
+            break;
+
+        default:
+            break;
+    }
+
+    return text;
+};
+
+// Функция для получения фразы с первой заглавной буквы
+const capitalizeFirstLetter = function(string) {
+    if (!string) {
+        return string;
+    }
+    return string[0].toUpperCase() + string.slice(1);
+};
 
 let appData = {
     income: {},
@@ -105,6 +86,18 @@ let appData = {
     budgetDay: 0,
     budgetMonth: 0,
     expensesMonth: 0,
+    // Функция start из практического занятия
+    start: function() {
+
+        do {
+            money = askUser(
+                Number,
+                'Ваш месячный доход?',
+                'Вы ввели некооректное значение. Укажите Ваш месячный доход числом.',
+                210000
+            );
+        } while (!isNumber(money));
+    },
     // Метод asking производит опрос пользователя 
     asking: function() {
         if (confirm('Есть ли у Вас дополнительный источник заработка?')) {
