@@ -6,7 +6,7 @@ const start = document.getElementById('start');
 
 // Кнопки “+” (плюс) через Tag, каждую в своей переменной.
 const btnPlus = document.getElementsByTagName('button');
-const buttonIncomeAdd = btnPlus[0];
+const incomePlus = btnPlus[0];
 const expensesPlus = btnPlus[1];
 
 // Чекбокс по id через querySelector
@@ -33,35 +33,13 @@ const expensesTitle = document.querySelector('.expenses-title');
 const additionalExpensesItem = document.querySelector('.additional_expenses-item');
 const targetAmount = document.querySelector('.target-amount');
 const periodSelect = document.querySelector('.period-select');
-const incomeItems = document.querySelectorAll('.income-items');
 
 let expensesItems = document.querySelectorAll('.expenses-items');
+let incomeItems = document.querySelectorAll('.income-items');
 
 
 let isNumber = function(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
-};
-
-// Функция опроса ползователя.
-const askUser = (type, correct, incorrect, defValue = '', repeat = false) => {
-    const promtText = repeat ? incorrect : correct;
-    let text = prompt(promtText, defValue);
-
-    switch (type) {
-        case Number:
-            text = !isNumber(text) ? askUser(type, correct, incorrect, defValue, true) : +text;
-
-            break;
-        case String:
-            text = isNumber(text) || text === null ? askUser(type, correct, incorrect, defValue, true) : text;
-
-            break;
-
-        default:
-            break;
-    }
-
-    return text;
 };
 
 // Функция для получения фразы с первой заглавной буквы
@@ -88,13 +66,7 @@ let appData = {
     // Функция start из практического занятия
     start: function() {
 
-        if (salaryAmount.value === '') {
-            alert('Ошибка, поле "Месячный доход" должно быть заполнено');
-            return;
-        }
-
         appData.budget = +salaryAmount.value;
-        console.log(salaryAmount.value);
 
         appData.getExpenses();
         appData.getIncome();
@@ -117,15 +89,33 @@ let appData = {
         additionalIncomeValue.value = appData.addIncome.join(', ');
         targetMonthValue.value = appData.getTargetMonth();
         incomePeriodValue.value = appData.calcPeriod();
+
+        /**
+         * Добавить обработчик события внутри метода showResult,
+         * который будет отслеживать период и сразу менять значение в поле “Накопления за период” 
+         * (После нажатия кнопки рассчитать, если меняем ползунок в range, 
+         * “Накопления за период” меняются динамически аналогично 4-ому пункту)
+         */
+        periodSelect.addEventListener('input', (event) => {
+            incomePeriodValue.value = appData.calcPeriod();
+        });
     },
     // Метод добавления полей обязательных расходов
     addExpensesBlock: function() {
         const cloneExpensesItem = expensesItems[0].cloneNode(true);
-        console.log(expensesItems.parentNode);
         expensesPlus.before(cloneExpensesItem);
         expensesItems = document.querySelectorAll('.expenses-items');
         if (expensesItems.length === 3) {
             expensesPlus.style.display = 'none';
+        }
+    },
+    // Метод добавления полей обязательных расходов
+    addIncomeBlock: function() {
+        const cloneIncomeItems = incomeItems[0].cloneNode(true);
+        incomePlus.before(cloneIncomeItems);
+        incomeItems = document.querySelectorAll('.income-items');
+        if (incomeItems.length === 3) {
+            incomePlus.style.display = 'none';
         }
     },
     // Метод получения всех расходов
@@ -141,22 +131,15 @@ let appData = {
     },
     // Метод получения сведений о дополнительном заработке
     getIncome: function() {
-        if (confirm('Есть ли у Вас дополнительный источник заработка?')) {
-            let itemIncome = askUser(
-                String,
-                'Какой у Вас дополнительный заработок?',
-                'Вы ввели число. Укажите наименование Вашего дополнительного заработка текстом.',
-                'Таксую'
-            );
-            let cashIncome = askUser(
-                Number,
-                'Сколько в месяц Вы зарабатываете на этом?',
-                'Вы ввели некооректное значение. Укажите числом сколько в месяц Вы зарабатываете на этом.',
-                10000
-            );
 
-            appData.addIncome[itemIncome] = +cashIncome;
-        }
+        incomeItems.forEach(function(item) {
+            const itemIncome = item.querySelector('.income-title').value;
+            const cashIncome = +item.querySelector('.income-amount').value;
+
+            if (incomeItems !== '' && cashIncome !== '') {
+                appData.addIncome[itemIncome] = cashIncome;
+            }
+        });
 
         for (const key in appData.addIncome) {
             if (Object.hasOwnProperty.call(appData.addIncome, key)) {
@@ -236,9 +219,22 @@ let appData = {
     }
 };
 
-start.addEventListener('click', appData.start);
+salaryAmount.addEventListener('input', (event) => {
+    if (event.target.value !== '') {
+        start.disabled = false;
+        start.addEventListener('click', appData.start);
+    } else {
+        start.disabled = true;
+        start.removeEventListener('click', appData.start);
+    }
+});
 
 expensesPlus.addEventListener('click', appData.addExpensesBlock);
+incomePlus.addEventListener('click', appData.addIncomeBlock);
+
+periodSelect.addEventListener('input', (event) => {
+    periodSelect.nextElementSibling.textContent = event.target.value;
+});
 
 
 
