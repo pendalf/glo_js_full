@@ -42,6 +42,24 @@ let isNumber = function(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 };
 
+const addInputListeners = el => {
+    el.querySelectorAll('[placeholder = "Наименование"]').forEach(item => {
+        item.addEventListener('input', event => {
+            if (!/[а-яА-Я\s\W]/.test(event.target.value.slice(-1))) {
+                event.target.value = event.target.value.slice(0, -1);
+            }
+        });
+    });
+
+    el.querySelectorAll('[placeholder = "Сумма"]').forEach(item => {
+        item.addEventListener('input', event => {
+            if (!/[\d]/.test(event.target.value.slice(-1))) {
+                event.target.value = event.target.value.slice(0, -1);
+            }
+        });
+    });
+};
+
 // Функция для получения фразы с первой заглавной буквы
 const capitalizeFirstLetter = function(string) {
     if (!string) {
@@ -104,6 +122,7 @@ let appData = {
     addExpensesBlock: function() {
         const cloneExpensesItem = expensesItems[0].cloneNode(true);
         cloneExpensesItem.querySelectorAll('input').forEach(item => item.value = '');
+        addInputListeners(cloneExpensesItem);
         expensesPlus.before(cloneExpensesItem);
         expensesItems = document.querySelectorAll('.expenses-items');
         if (expensesItems.length === 3) {
@@ -114,6 +133,7 @@ let appData = {
     addIncomeBlock: function() {
         const cloneIncomeItems = incomeItems[0].cloneNode(true);
         cloneIncomeItems.querySelectorAll('input').forEach(item => item.value = '');
+        addInputListeners(cloneIncomeItems);
         incomePlus.before(cloneIncomeItems);
         incomeItems = document.querySelectorAll('.income-items');
         if (incomeItems.length === 3) {
@@ -238,21 +258,8 @@ periodSelect.addEventListener('input', (event) => {
     periodSelect.nextElementSibling.textContent = event.target.value;
 });
 
-document.querySelectorAll('[placeholder = "Наименование"]').forEach(item => {
-    item.addEventListener('input', event => {
-        if (!/[а-яА-Я\s\W]/.test(event.target.value.slice(-1))) {
-            event.target.value = event.target.value.slice(0, -1)
-        }
-    });
-});
+addInputListeners(document);
 
-document.querySelectorAll('[placeholder = "Сумма"]').forEach(item => {
-    item.addEventListener('input', event => {
-        if (!/[\d]/.test(event.target.value.slice(-1))) {
-            event.target.value = event.target.value.slice(0, -1)
-        }
-    });
-});
 
 
 
