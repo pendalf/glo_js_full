@@ -12,12 +12,15 @@ const DomElement = function(selector, options) {
 };
 
 DomElement.prototype.create = function() {
-    const el = document.createElement('div');
+    let el = document.createElement('div');
+
     if (/^\./.test(this.selector)) {
         el.className = this.selector.substring(1);
     } else if (/^#/.test(this.selector)) {
+        el = document.createElement('p');
         el.id = this.selector.substring(1);
     }
+
     el.style.cssText = `height: ${this.height};
     width: ${this.width};
     background: ${this.bg};
