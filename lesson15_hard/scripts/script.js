@@ -54,14 +54,9 @@ class AppData {
 
         this.budget = +salaryAmount.value;
 
-        // this.getExpenses();
-        // this.getIncome();
-
         this.getExpInc();
-
         this.getExpensesMonth();
-        this.getAddExpenses();
-        this.getAddIncome();
+        this.getAddExpInc();
         this.getBudget();
 
         this.showResult();
@@ -95,9 +90,12 @@ class AppData {
         document.querySelectorAll('.income-items').forEach((item, i) => i > 0 ? item.remove() : false);
 
         this.showResult();
-        start.style.display = 'block';
+        start.style.display = '';
         start.disabled = true;
         cancel.style.display = 'none';
+
+        expensesPlus.style.display = '';
+        incomePlus.style.display = '';
     }
 
     // Метод отображения результатов
@@ -145,12 +143,25 @@ class AppData {
         }
     }
 
+    // Метод добавления полей обязательных доходов/расходов
+    addExpIncBlock(e) {
+        const startStr = e.target.className.split(' ').reduce((a, b) => b.indexOf('add') !== -1 ? b.split('_')[0] : '');
+        const cloneItems = eval(`${startStr}Items`)[0].cloneNode(true);
+        const plus = eval(`${startStr}Plus`);
+        cloneItems.querySelectorAll('input').forEach(item => item.value = '');
+        this.addInputListeners(cloneItems);
+        plus.before(cloneItems);
+        const items = document.querySelectorAll(`.${startStr}-items`);
+        if (items.length === 3) {
+            plus.style.display = 'none';
+        }
+    }
+
     // Метод получения расходов/доходов
     getExpInc() {
         const count = item => {
 
             const startStr = item.className.split('-')[0];
-            console.log(startStr);
             const itemTitle = item.querySelector(`.${startStr}-title`).value;
             const itemAmount = +item.querySelector(`.${startStr}-amount`).value;
 
@@ -169,25 +180,21 @@ class AppData {
         }
     }
 
-    // Метод получения возможных расходов
-    getAddExpenses() {
-        let addExpenses = additionalExpensesItem.value.split(',');
-        addExpenses.forEach((item) => {
-            item = item.trim();
-            if (item !== '') {
-                this.addExpenses.push(item.trim());
-            }
-        });
-    }
+    // Метод получения возможных доходов/расходов
+    getAddExpInc() {
 
-    // Метод получения возможных доходов
-    getAddIncome() {
-        additionalIncomeItem.forEach((item) => {
-            let itemValue = item.value.trim();
+        const addExpenses = additionalExpensesItem.value.split(',');
+        const count = item => {
+
+            const itemType = item.className ? 'Income' : 'Expenses';
+            const itemValue = item.value ? item.value.trim() : item.trim();
             if (itemValue !== '') {
-                this.addIncome.push(itemValue);
+                this[`add${itemType}`].push(itemValue);
             }
-        });
+        };
+
+        additionalIncomeItem.forEach(count);
+        addExpenses.forEach(count);
     }
 
     // Метод getExpensesMonth возвращает сумму всех обязательных расходов за месяц
@@ -273,8 +280,8 @@ class AppData {
         });
         cancel.addEventListener('click', resetApp);
 
-        expensesPlus.addEventListener('click', this.addExpensesBlock.bind(this));
-        incomePlus.addEventListener('click', this.addIncomeBlock.bind(this));
+        expensesPlus.addEventListener('click', this.addExpIncBlock.bind(this));
+        incomePlus.addEventListener('click', this.addExpIncBlock.bind(this));
 
         periodSelect.addEventListener('input', (event) => {
             periodSelect.nextElementSibling.textContent = event.target.value;
