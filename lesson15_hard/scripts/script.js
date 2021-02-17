@@ -54,8 +54,11 @@ class AppData {
 
         this.budget = +salaryAmount.value;
 
-        this.getExpenses();
-        this.getIncome();
+        // this.getExpenses();
+        // this.getIncome();
+
+        this.getExpInc();
+
         this.getExpensesMonth();
         this.getAddExpenses();
         this.getAddIncome();
@@ -142,34 +145,26 @@ class AppData {
         }
     }
 
-    // Метод получения всех расходов
-    getExpenses() {
-        expensesItems.forEach(function(item) {
-            const itemExpenses = item.querySelector('.expenses-title').value;
-            const cashExpenses = +item.querySelector('.expenses-amount').value;
+    // Метод получения расходов/доходов
+    getExpInc() {
+        const count = item => {
 
-            if (itemExpenses !== '' && cashExpenses !== '') {
-                this.expenses[itemExpenses] = cashExpenses;
+            const startStr = item.className.split('-')[0];
+            console.log(startStr);
+            const itemTitle = item.querySelector(`.${startStr}-title`).value;
+            const itemAmount = +item.querySelector(`.${startStr}-amount`).value;
+
+            if (itemTitle !== '' && itemAmount !== '') {
+                this[startStr][itemTitle] = itemAmount;
             }
-        }.bind(this));
-    }
+        };
 
-    // Метод получения сведений о дополнительном заработке
-    getIncome() {
+        expensesItems.forEach(count);
+        incomeItems.forEach(count);
 
-        incomeItems.forEach(function(item) {
-            const itemIncome = item.querySelector('.income-title').value;
-            const cashIncome = +item.querySelector('.income-amount').value;
-
-            if (incomeItems !== '' && cashIncome !== '') {
-                this.addIncome[itemIncome] = cashIncome;
-            }
-        }.bind(this));
-
-        for (const key in this.addIncome) {
-            if (Object.hasOwnProperty.call(this.addIncome, key)) {
-                this.incomeMonth += +this.addIncome[key];
-
+        for (const key in this.income) {
+            if (Object.hasOwnProperty.call(this.income, key)) {
+                this.incomeMonth += +this.income[key];
             }
         }
     }
@@ -286,6 +281,7 @@ class AppData {
         });
         this.addInputListeners(document);
     }
+
     addInputListeners(el) {
         el.querySelectorAll('[placeholder = "Наименование"]').forEach(item => {
             item.addEventListener('input', event => {
