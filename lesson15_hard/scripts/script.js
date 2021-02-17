@@ -187,7 +187,7 @@ class AppData {
         const count = item => {
 
             const itemType = item.className ? 'Income' : 'Expenses';
-            const itemValue = item.value ? item.value.trim() : item.trim();
+            const itemValue = typeof item.value !== 'undefined' ? item.value.trim() : item.trim();
             if (itemValue !== '') {
                 this[`add${itemType}`].push(itemValue);
             }
