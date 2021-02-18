@@ -43,13 +43,48 @@ class AppData {
         this.budgetDay = 0;
         this.budgetMonth = 0;
         this.expensesMonth = 0;
+        this.targetMonth = 0;
+        this.periodRange = 1;
 
         this.eventsListeners();
+        this.startApp();
     }
 
     check() {
         if (salaryAmount.value !== '') {
             start.disabled = false;
+        }
+    }
+
+    startApp() {
+
+        const localStorageBudget = localStorage.budget ? JSON.parse(localStorage.budget) : null;
+
+        if (this.isNoExpired()) {
+            {
+                ({
+                    income: this.income,
+                    incomeMonth: this.incomeMonth,
+                    addIncome: this.addIncome,
+                    expenses: this.expenses,
+                    addExpenses: this.addExpenses,
+                    deposit: this.deposit,
+                    percentDeposit: this.percentDeposit,
+                    moneyDeposit: this.moneyDeposit,
+                    budget: this.budget,
+                    budgetDay: this.budgetDay,
+                    budgetMonth: this.budgetMonth,
+                    expensesMonth: this.expensesMonth,
+                    targetMonth: this.targetMonth,
+                    periodRange: this.periodRange
+                } = localStorageBudget);
+                this.showResult();
+                this.disableApp();
+                periodSelect.value = this.periodRange;
+                periodSelect.dispatchEvent(new Event('input'));
+            }
+        } else {
+            this.reset();
         }
     }
 
@@ -62,12 +97,13 @@ class AppData {
         this.getAddExpInc();
         this.getInfoDeposit();
         this.getBudget();
+        this.getTargetMonth();
 
         this.showResult();
+        this.disableApp();
 
-        document.querySelectorAll('.data input[type=text] ').forEach(item => item.disabled = true);
-        start.style.display = 'none';
-        cancel.style.display = 'block';
+        this.setLocalstorage();
+        this.setCookies();
     }
 
     // Метод возвращения программы в имходное состояние
@@ -84,6 +120,8 @@ class AppData {
         this.budgetDay = 0;
         this.budgetMonth = 0;
         this.expensesMonth = 0;
+        this.targetMonth = '';
+        this.periodRange = 1;
 
         document.querySelectorAll('.data input[type=text] ').forEach(item => item.value = '');
         depositCheck.checked = false;
@@ -93,13 +131,25 @@ class AppData {
         document.querySelectorAll('.expenses-items').forEach((item, i) => i > 0 ? item.remove() : false);
         document.querySelectorAll('.income-items').forEach((item, i) => i > 0 ? item.remove() : false);
 
+        this.depositHandler();
         this.showResult();
+        this.removeLocalStorage();
+        this.removeCookies();
+
         start.style.display = '';
         start.disabled = true;
         cancel.style.display = 'none';
 
         expensesPlus.style.display = '';
         incomePlus.style.display = '';
+    }
+
+    // Метод блокировки полей ввода
+    disableApp() {
+
+        document.querySelectorAll('.data input[type=text] ').forEach(item => item.disabled = true);
+        start.style.display = 'none';
+        cancel.style.display = 'block';
     }
 
     // Метод отображения результатов
@@ -109,7 +159,7 @@ class AppData {
         expensesMonthValue.value = this.expensesMonth;
         additionalExpensesValue.value = this.addExpenses.join(', ');
         additionalIncomeValue.value = this.addIncome.join(', ');
-        targetMonthValue.value = this.getTargetMonth();
+        targetMonthValue.value = this.targetMonth;
         incomePeriodValue.value = this.calcPeriod();
 
         /**
@@ -118,33 +168,10 @@ class AppData {
          * (После нажатия кнопки рассчитать, если меняем ползунок в range, 
          * “Накопления за период” меняются динамически аналогично 4-ому пункту)
          */
-        periodSelect.addEventListener('input', () => {
+        periodSelect.addEventListener('input', (e) => {
+            this.periodRange = e.target.value;
             incomePeriodValue.value = this.calcPeriod();
         });
-    }
-
-    // Метод добавления полей обязательных расходов
-    addExpensesBlock() {
-        const cloneExpensesItem = expensesItems[0].cloneNode(true);
-        cloneExpensesItem.querySelectorAll('input').forEach(item => item.value = '');
-        this.addInputListeners(cloneExpensesItem);
-        expensesPlus.before(cloneExpensesItem);
-        expensesItems = document.querySelectorAll('.expenses-items');
-        if (expensesItems.length === 3) {
-            expensesPlus.style.display = 'none';
-        }
-    }
-
-    // Метод добавления полей обязательных расходов
-    addIncomeBlock() {
-        const cloneIncomeItems = incomeItems[0].cloneNode(true);
-        cloneIncomeItems.querySelectorAll('input').forEach(item => item.value = '');
-        this.addInputListeners(cloneIncomeItems);
-        incomePlus.before(cloneIncomeItems);
-        incomeItems = document.querySelectorAll('.income-items');
-        if (incomeItems.length === 3) {
-            incomePlus.style.display = 'none';
-        }
     }
 
     // Метод добавления полей обязательных доходов/расходов
@@ -174,8 +201,8 @@ class AppData {
             }
         };
 
-        expensesItems.forEach(count);
-        incomeItems.forEach(count);
+        document.querySelectorAll('.expenses-items').forEach(count);
+        document.querySelectorAll('.income-items').forEach(count);
 
         for (const key in this.income) {
             if (Object.hasOwnProperty.call(this.income, key)) {
@@ -227,7 +254,7 @@ class AppData {
      */
 
     getTargetMonth() {
-        return Math.ceil(targetAmount.value / this.budgetMonth) || '';
+        this.targetMonth = Math.ceil(targetAmount.value / this.budgetMonth) || '';
     }
 
     // getStatusIncome возвращает уровень дохода в зависимости от бюджета на день
@@ -245,7 +272,7 @@ class AppData {
 
     // Метод получения накоплений за период
     calcPeriod() {
-        return this.budgetMonth * periodSelect.value;
+        return this.budgetMonth * this.periodRange;
     }
 
     getInfoDeposit() {
@@ -333,6 +360,89 @@ class AppData {
             this.deposit = false;
             depositBank.removeEventListener('change', this.changePercent);
         }
+    }
+
+    setLocalstorage() {
+        localStorage.budget = JSON.stringify(this);
+    }
+
+    removeLocalStorage() {
+        localStorage.removeItem('budget');
+    }
+
+    // метод установки cookies для приложения
+    setCookies() {
+        const options = {
+            'max-age': 3600 * 24
+        };
+        Object.keys(this).forEach(item => {
+            this.setCookie(item, this[item], options);
+        });
+        this.setCookie('isLoad', true, options);
+    }
+
+    // Метод удаления cookie для приложения
+    removeCookies() {
+        Object.keys(this).forEach(item => {
+            this.deleteCookie(item);
+        });
+        this.deleteCookie('isLoad');
+    }
+
+    // метод установки cookie
+    setCookie(name, value, options = {}) {
+
+        options = {
+            path: '/',
+            // при необходимости добавьте другие значения по умолчанию
+            ...options
+        };
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        let updatedCookie = encodeURIComponent(name) + "=" + JSON.stringify(value);
+
+        for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+
+        document.cookie = updatedCookie;
+    }
+
+    // метод удаления cookie
+    deleteCookie(name) {
+        this.setCookie(name, "", {
+            'max-age': -1
+        });
+    }
+
+    // Метод получения cookie
+    getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? JSON.parse(matches[1]) : undefined;
+    }
+
+    isNoExpired() {
+        const localStorageBudget = localStorage.budget ? JSON.parse(localStorage.budget) : null;
+        if (!localStorageBudget) {
+            return false;
+        }
+        return Object.keys(localStorageBudget).reduce((a, b) => {
+            const cookie = JSON.stringify(this.getCookie(b));
+            const LCItem = JSON.stringify(localStorageBudget[b]);
+            if (a !== false && LCItem === cookie) {
+                return true;
+            }
+            return false;
+        });
     }
 }
 
