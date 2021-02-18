@@ -262,9 +262,11 @@ class AppData {
     changePercent() {
         const valueSelect = this.value;
         if (valueSelect === 'other') {
-            // Домашне задание
+            depositPercent.value = '';
+            depositPercent.style.display = 'inline-block';
         } else {
             depositPercent.value = valueSelect;
+            depositPercent.style.display = '';
         }
     }
 
@@ -306,7 +308,7 @@ class AppData {
             });
         });
 
-        el.querySelectorAll('[placeholder = "Сумма"]').forEach(item => {
+        el.querySelectorAll('[placeholder = "Сумма"], [placeholder = "Процент"]').forEach(item => {
             item.addEventListener('input', event => {
                 if (!/[\d]/.test(event.target.value.slice(-1))) {
                     event.target.value = event.target.value.slice(0, -1);
@@ -324,8 +326,10 @@ class AppData {
         } else {
             depositBank.style.display = '';
             depositAmount.style.display = '';
+            depositPercent.style.display = '';
             depositBank.value = '';
             depositAmount.value = '';
+            depositPercent.value = '';
             this.deposit = false;
             depositBank.removeEventListener('change', this.changePercent);
         }
