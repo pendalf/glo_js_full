@@ -94,6 +94,8 @@ class AppData {
         document.querySelectorAll('.income-items').forEach((item, i) => i > 0 ? item.remove() : false);
 
         this.showResult();
+        this.depositHandler();
+
         start.style.display = '';
         start.disabled = true;
         cancel.style.display = 'none';
