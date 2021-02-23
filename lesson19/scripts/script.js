@@ -1,5 +1,69 @@
 window.addEventListener('DOMContentLoaded', () => {
 
+    /**
+     * Функция анимации
+     *
+     * https://learn.javascript.ru/js-animation
+     *
+     * duration – общая продолжительность анимации в миллисекундах.
+     * timing – функция вычисления прогресса анимации. Получается момент времени от 0 до 1,
+     * возвращает прогресс анимации, обычно тоже от 0 до 1.
+     * draw – функция отрисовки анимации.
+     *
+     */
+    const animate = function({ timing, draw, duration, element }) {
+
+        const start = performance.now();
+
+        requestAnimationFrame(function animate(time) {
+            // timeFraction изменяется от 0 до 1
+            let timeFraction = (time - start) / duration;
+            if (timeFraction > 1) timeFraction = 1;
+
+            // вычисление текущего состояния анимации
+            const progress = timing(timeFraction);
+
+            draw(progress, element); // отрисовать её
+
+            if (timeFraction < 1) {
+                requestAnimationFrame(animate);
+            }
+
+        });
+    };
+
+    /**
+     * Дуга
+     * Функции расчёта времени
+     *
+     * https://learn.javascript.ru/js-animation#duga
+     *
+     * @param {number} timeFraction от 0 до 1
+     *
+     */
+    const circ = function(timeFraction) {
+        return 1 - Math.sin(Math.acos(timeFraction));
+    };
+
+    /**
+     * Принимает функцию расчёта времени и возрващает преобразованный вариант
+     *
+     * https://learn.javascript.ru/js-animation#easeout
+     *
+     * @param {function} timing Функция расчёта времени
+     *
+     */
+    const makeEaseOut = function(timing) {
+        return function(timeFraction) {
+            return timing(1 - timeFraction);
+        };
+    };
+
+    const popupActions = function(progress, element) {
+        element.style.opacity = progress;
+        element.style.display = progress ? 'block' : 'none';
+    };
+
     // Timer
     function countTimer(deadline) {
         const timerHours = document.querySelector('#timer-hours'),
@@ -46,11 +110,6 @@ window.addEventListener('DOMContentLoaded', () => {
             menuItems = menu.querySelectorAll('li');
 
         const actionMenu = () => {
-            // if (!menu.style.transform || menu.style.transform === `translate(-100%)`) {
-            //     menu.style.transform = `translate(0)`;
-            // } else {
-            //     menu.style.transform = `translate(-100%)`;
-            // }
             menu.classList.toggle('active-menu');
         };
 
@@ -62,20 +121,43 @@ window.addEventListener('DOMContentLoaded', () => {
     toggleMenu();
 
     // popup
-    const togglePopup = () => {
+    const togglePopup = function() {
         const popup = document.querySelector('.popup'),
             popupBtn = document.querySelectorAll('.popup-btn'),
             closePopup = document.querySelector('.popup-close');
 
-        popupBtn.forEach(item => {
-            item.addEventListener('click', () => {
+        const isMobile = () => window.innerWidth < 768;
+
+        const fadeIn = () => {
+            if (!isMobile()) {
+                animate({
+                    element: popup,
+                    duration: 1000,
+                    timing: circ,
+                    draw: popupActions
+                });
+            } else {
                 popup.style.display = 'block';
-            });
+            }
+        };
+
+        const fadeOut = () => {
+            if (!isMobile()) {
+                animate({
+                    element: popup,
+                    duration: 1000,
+                    timing: makeEaseOut(circ),
+                    draw: popupActions
+                });
+            } else {
+                popup.style.display = 'none';
+            }
+        };
+
+        popupBtn.forEach(item => {
+            item.addEventListener('click', fadeIn);
         });
-        closePopup.addEventListener('click', () => {
-            popup.style.display = 'none';
-        });
+        closePopup.addEventListener('click', fadeOut);
     };
     togglePopup();
-
 });
