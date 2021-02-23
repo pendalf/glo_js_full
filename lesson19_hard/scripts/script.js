@@ -188,6 +188,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 popup.style.display = 'block';
+                popup.style.opacity = '';
+
             }
         };
 
@@ -201,6 +203,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 popup.style.display = 'none';
+                popup.style.opacity = '';
             }
         };
 
