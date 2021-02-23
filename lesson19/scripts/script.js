@@ -37,4 +37,45 @@ window.addEventListener('DOMContentLoaded', () => {
 
     countTimer('22 feb 2021 10:50');
 
+    // Меню
+    const toggleMenu = () => {
+
+        const btnMenu = document.querySelector('.menu'),
+            menu = document.querySelector('menu'),
+            closeBtn = document.querySelector('.close-btn'),
+            menuItems = menu.querySelectorAll('li');
+
+        const actionMenu = () => {
+            // if (!menu.style.transform || menu.style.transform === `translate(-100%)`) {
+            //     menu.style.transform = `translate(0)`;
+            // } else {
+            //     menu.style.transform = `translate(-100%)`;
+            // }
+            menu.classList.toggle('active-menu');
+        };
+
+        btnMenu.addEventListener('click', actionMenu);
+        closeBtn.addEventListener('click', actionMenu);
+        menuItems.forEach(item => item.addEventListener('click', actionMenu));
+    };
+
+    toggleMenu();
+
+    // popup
+    const togglePopup = () => {
+        const popup = document.querySelector('.popup'),
+            popupBtn = document.querySelectorAll('.popup-btn'),
+            closePopup = document.querySelector('.popup-close');
+
+        popupBtn.forEach(item => {
+            item.addEventListener('click', () => {
+                popup.style.display = 'block';
+            });
+        });
+        closePopup.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+    };
+    togglePopup();
+
 });
