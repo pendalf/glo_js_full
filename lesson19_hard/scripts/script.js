@@ -46,7 +46,9 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * Принимает функцию расчёта времени и возрващает преобразованный вариант
+     * easeOut
+     *
+     * Принимает функцию расчёта времени и возрващает инвертированный преобразованный вариант
      *
      * https://learn.javascript.ru/js-animation#easeout
      *
@@ -58,10 +60,32 @@ window.addEventListener('DOMContentLoaded', () => {
             return timing(1 - timeFraction);
         };
     };
+    /**
+     * easeInOut
+     *
+     * Принимает функцию расчёта времени и возрващает преобразованный вариант
+     *
+     * https://learn.javascript.ru/js-animation#easeinout
+     *
+     * @param {function} timing Функция расчёта времени
+     *
+     */
+    function makeEaseInOut(timing) {
+        return function(timeFraction) {
+            if (timeFraction < .5)
+                return timing(2 * timeFraction) / 2;
+            else
+                return (2 - timing(2 * (1 - timeFraction))) / 2;
+        };
+    }
 
     const popupActions = function(progress, element) {
         element.style.opacity = progress;
         element.style.display = progress ? 'block' : 'none';
+    };
+
+    const scrollTo = (progress, element) => {
+        window.scrollTo(0, (element.to - element.from) * progress + element.from);
     };
 
     // Timer
@@ -107,15 +131,41 @@ window.addEventListener('DOMContentLoaded', () => {
         const btnMenu = document.querySelector('.menu'),
             menu = document.querySelector('menu'),
             closeBtn = document.querySelector('.close-btn'),
-            menuItems = menu.querySelectorAll('li');
+            menuItems = menu.querySelectorAll('li'),
+            nextSlideBtn = document.querySelector('[href="#service-block"]');
 
         const actionMenu = () => {
             menu.classList.toggle('active-menu');
         };
 
+        const menuScrollTo = function(el) {
+            el = el.tagName === 'A' ? el : el.querySelector('a');
+            const to = el.getAttribute('href') || false,
+                toEl = to ? document.querySelector(to) : false;
+            if (toEl) {
+                this.preventDefault();
+                const scroll = {
+                    from: document.documentElement.scrollTop,
+                    to: toEl.getBoundingClientRect().top - document.body.getBoundingClientRect().top
+                };
+                animate({
+                    element: scroll,
+                    duration: 1000,
+                    timing: makeEaseInOut(circ),
+                    draw: scrollTo
+                });
+            }
+        };
+
         btnMenu.addEventListener('click', actionMenu);
         closeBtn.addEventListener('click', actionMenu);
-        menuItems.forEach(item => item.addEventListener('click', actionMenu));
+        menuItems.forEach(item => item.addEventListener('click', e => {
+            actionMenu();
+            menuScrollTo.bind(e)(item);
+        }));
+        nextSlideBtn.addEventListener('click', function(e) {
+            menuScrollTo.bind(e)(this);
+        });
     };
 
     toggleMenu();
