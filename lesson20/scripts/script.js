@@ -128,11 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Меню
     const toggleMenu = () => {
 
-        const btnMenu = document.querySelector('.menu'),
-            menu = document.querySelector('menu'),
-            closeBtn = document.querySelector('.close-btn'),
-            menuItems = menu.querySelectorAll('li'),
-            nextSlideBtn = document.querySelector('[href="#service-block"]');
+        const menu = document.querySelector('menu');
 
         const actionMenu = () => {
             menu.classList.toggle('active-menu');
@@ -156,15 +152,18 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             }
         };
-
-        btnMenu.addEventListener('click', actionMenu);
-        closeBtn.addEventListener('click', actionMenu);
-        menuItems.forEach(item => item.addEventListener('click', e => {
-            actionMenu();
-            menuScrollTo.bind(e)(item);
-        }));
-        nextSlideBtn.addEventListener('click', function(e) {
-            menuScrollTo.bind(e)(this);
+        document.addEventListener('click', e => {
+            const target = e.target;
+            console.log(target);
+            if (target.closest('.menu')) {
+                actionMenu();
+            }
+            if (target.closest('menu') && target.closest('a')) {
+                actionMenu();
+            }
+            if (target.closest('a') && target.closest('a').getAttribute('href')[0] === '#') {
+                menuScrollTo.bind(e)(target.closest('a'));
+            }
         });
     };
 
