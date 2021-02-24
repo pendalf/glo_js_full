@@ -173,8 +173,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // popup
     const togglePopup = function() {
         const popup = document.querySelector('.popup'),
-            popupBtn = document.querySelectorAll('.popup-btn'),
-            closePopup = document.querySelector('.popup-close');
+            popupBtn = document.querySelectorAll('.popup-btn');
 
         const isMobile = () => window.innerWidth < 768;
 
@@ -210,7 +209,50 @@ window.addEventListener('DOMContentLoaded', () => {
         popupBtn.forEach(item => {
             item.addEventListener('click', fadeIn);
         });
-        closePopup.addEventListener('click', fadeOut);
+        popup.addEventListener('click', event => {
+            let target = event.target;
+            if (target.classList.contains('popup-close')) {
+                target = null;
+            }
+            target = target ? target.closest('.popup-content') : null;
+            if (!target) {
+                fadeOut();
+            }
+        });
     };
     togglePopup();
+
+    // Табы
+    const tabs = () => {
+        const tabHeader = document.querySelector('.service-header'),
+            tab = tabHeader.querySelectorAll('.service-header-tab'),
+            tabContent = document.querySelectorAll('.service-tab');
+
+        const toggleTabContent = index => {
+            tabContent.forEach((element, i) => {
+                if (i === index) {
+                    tab[i].classList.add('active');
+                    element.classList.remove('d-none');
+                } else {
+                    element.classList.add('d-none');
+                    tab[i].classList.remove('active');
+                }
+            });
+        };
+
+        tabHeader.addEventListener('click', event => {
+            let target = event.target;
+            target = target.closest('.service-header-tab');
+            if (target) {
+                tab.forEach((item, i) => {
+                    if (item === target) {
+                        toggleTabContent(i);
+                    }
+                    return;
+                });
+            }
+
+        });
+    };
+    tabs();
 });
