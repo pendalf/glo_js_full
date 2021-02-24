@@ -154,11 +154,14 @@ window.addEventListener('DOMContentLoaded', () => {
         };
         document.addEventListener('click', e => {
             const target = e.target;
-            console.log(target);
-            if (target.closest('.menu')) {
+            if (target.closest('menu')) {
+                if (target.closest('a')) {
+                    actionMenu();
+                }
+            } else if (menu.classList.contains('active-menu')) {
                 actionMenu();
             }
-            if (target.closest('menu') && target.closest('a')) {
+            if (target.closest('.menu')) {
                 actionMenu();
             }
             if (target.closest('a') && target.closest('a').getAttribute('href')[0] === '#') {
