@@ -272,15 +272,15 @@ window.addEventListener('DOMContentLoaded', () => {
         let currentSlide = 0,
             interval;
 
-
-        dotsContainer.append(...dot);
-
         const prevSlide = (elem, index, strClass) => {
             elem[index].classList.remove(strClass);
         };
         const nextSlide = (elem, index, strClass) => {
             elem[index].classList.add(strClass);
         };
+
+        dotsContainer.append(...dot);
+        nextSlide(dot, currentSlide, 'dot-active');
 
         const autoPlaySlide = () => {
             prevSlide(slide, currentSlide, 'portfolio-item-active');
