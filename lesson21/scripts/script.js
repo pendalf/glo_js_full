@@ -261,12 +261,19 @@ window.addEventListener('DOMContentLoaded', () => {
     // Слайдер
     const slider = () => {
         const slide = document.querySelectorAll('.portfolio-item'),
-            btn = document.querySelectorAll('.portfolio-btn'),
-            dot = document.querySelectorAll('.dot'),
-            slider = document.querySelector('.portfolio-content');
+            dotsContainer = document.querySelector('.portfolio-dots'),
+            slider = document.querySelector('.portfolio-content'),
+            dot = [...Array(slide.length)].map(() => {
+                const el = document.createElement('li');
+                el.classList.add('dot');
+                return el;
+            });
 
         let currentSlide = 0,
             interval;
+
+
+        dotsContainer.append(...dot);
 
         const prevSlide = (elem, index, strClass) => {
             elem[index].classList.remove(strClass);
