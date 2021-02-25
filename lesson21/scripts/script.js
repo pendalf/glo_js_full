@@ -164,7 +164,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (target.closest('.menu')) {
                 actionMenu();
             }
-            if (target.closest('a') && target.closest('a').getAttribute('href')[0] === '#') {
+            if (target.closest('a') && target.closest('a').getAttribute('href').length > 1 && target.closest('a').getAttribute('href')[0] === '#') {
                 menuScrollTo.bind(e)(target.closest('a'));
             }
         });
