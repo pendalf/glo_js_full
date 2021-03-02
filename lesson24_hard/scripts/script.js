@@ -402,6 +402,23 @@ window.addEventListener('DOMContentLoaded', () => {
             calcDay = document.querySelector('.calc-day'),
             totalValue = document.getElementById('total');
 
+        const sumChangeVisual = (sum, time = 2000) => {
+            const timeout = 10,
+                sumNow = +totalValue.textContent,
+                delta = sum - sumNow,
+                now = Date.now(),
+                step = Math.round(1000 * timeout / sum),
+                int = setInterval(() => {
+                    const total = Math.round(sumNow + (delta * (Date.now() - now) / time));
+                    if ((delta > 0 && total <= sum) || (delta < 0 && total >= sum)) {
+                        totalValue.textContent = total;
+                    } else {
+                        totalValue.textContent = sum;
+                        clearInterval(int);
+                    }
+                }, step);
+        };
+
         const countSum = () => {
 
             let total = 0,
@@ -425,7 +442,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 total = price * typeValue * squareValue * countValue * dayValue;
             }
 
-            totalValue.textContent = total;
+            sumChangeVisual(total, 1000);
         };
 
         calcBlock.addEventListener('change', e => {
