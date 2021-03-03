@@ -388,8 +388,85 @@
             </div>
         </div>
     </div>
-
+    <script src="./plugins/validator/validator.js"></script>
     <script src="./scripts/script.js"></script>
+    <script>
+        const form1 = new Validator({
+            selector: '#form1',
+            pattern: {
+                phone: /^\d+$/,
+                userName: /^[А-Яа-яЁё ]+$/
+            },
+            method: {
+                'form1-name': [
+                    ['notEmpty'],
+                    ['pattern', 'userName']
+                ],
+                'form1-phone': [
+                    ['notEmpty'],
+                    ['pattern', 'phone']
+                ],
+                'form1-email': [
+                    ['notEmpty'],
+                    ['pattern', 'email']
+                ]
+            }
+        });
+
+        form1.init();
+
+        const form2 = new Validator({
+            selector: '#form2',
+            pattern: {
+                phone: /^\d+$/,
+                userName: /^[А-Яа-яЁё ]+$/
+            },
+            method: {
+                'form2-name': [
+                    ['notEmpty'],
+                    ['pattern', 'userName']
+                ],
+                'form2-phone': [
+                    ['notEmpty'],
+                    ['pattern', 'phone']
+                ],
+                'form2-email': [
+                    ['notEmpty'],
+                    ['pattern', 'email']
+                ],
+                'form2-message': [
+                    ['notEmpty'],
+                    ['pattern', 'userName']
+                ]
+            }
+        });
+
+        form2.init();
+
+        const form3 = new Validator({
+            selector: '#form3',
+            pattern: {
+                phone: /^\d+$/,
+                userName: /^[А-Яа-яЁё ]+$/
+            },
+            method: {
+                'form3-name': [
+                    ['notEmpty'],
+                    ['pattern', 'userName']
+                ],
+                'form3-phone': [
+                    ['notEmpty'],
+                    ['pattern', 'phone']
+                ],
+                'form3-email': [
+                    ['notEmpty'],
+                    ['pattern', 'email']
+                ]
+            }
+        });
+
+        form3.init();
+    </script>
 
 </body>
 
