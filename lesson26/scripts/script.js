@@ -360,7 +360,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Валидация форм
     const validationForms = () => {
         const digits = document.querySelectorAll('.calc-square, .calc-count, .calc-day'),
-            cyrillic = document.querySelectorAll('[name="user_name"], [name="user_message"'),
+            userName = document.querySelectorAll('[name="user_name"]'),
+            cyrillic = document.querySelectorAll('[name="user_message"'),
             email = document.querySelectorAll('[name="user_email"'),
             phone = document.querySelectorAll('[name="user_phone"]');
 
@@ -386,9 +387,10 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         };
         disableSymbols(digits, /\D/g);
-        disableSymbols(cyrillic, /[^А-Яа-яЁё -]/g);
+        disableSymbols(userName, /[^А-Яа-яЁё ]/g);
+        disableSymbols(cyrillic, /[^А-Яа-яЁё\d .,;:?!-]/g);
         disableSymbols(email, /[^a-z@~!\.\*\'-]/gi);
-        disableSymbols(phone, /[^\d\(\)-]/g);
+        disableSymbols(phone, /[^\d\+]/g);
 
     };
     validationForms();
@@ -457,23 +459,22 @@ window.addEventListener('DOMContentLoaded', () => {
     calc(100);
 
     // send-ajax-form
-    const sendForm = () => {
+    const sendForm = selector => {
         const errorMessage = `Что то пошло не так...`,
             loadMessage = 'Загрузка....',
             successMessage = 'Спасибо! Мы скоро с вами свяжемся!';
 
-        const form = document.getElementById('form1');
+        const form = document.querySelector(selector);
 
         const statusMessage = document.createElement('div');
         statusMessage.textContent = successMessage;
-        statusMessage.style.cssText = 'font-size: 2rem;';
+        statusMessage.style.cssText = `font-size: 2rem; ${selector === '#form3' ? 'color: #ffffff;' : ''}`;
 
         const postData = (body, outputData, errorData) => {
 
             const request = new XMLHttpRequest();
 
             request.addEventListener('readystatechange', () => {
-                statusMessage.textContent = loadMessage;
 
                 if (request.readyState !== 4) {
                     return;
@@ -498,8 +499,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 body = {};
             formData.forEach((v, k) => body[k] = v);
             form.append(statusMessage);
+            statusMessage.textContent = loadMessage;
+
             postData(body,
                 () => {
+                    form.reset();
                     statusMessage.textContent = successMessage;
                 },
                 error => {
@@ -511,5 +515,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
     };
-    sendForm();
+    sendForm('#form1');
+    sendForm('#form2');
+    sendForm('#form3');
 });
