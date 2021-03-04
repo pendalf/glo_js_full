@@ -468,9 +468,7 @@ window.addEventListener('DOMContentLoaded', () => {
         statusMessage.textContent = successMessage;
         statusMessage.style.cssText = 'font-size: 2rem;';
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            form.append(statusMessage);
+        const postData = (body, outputData, errorData) => {
 
             const request = new XMLHttpRequest();
 
@@ -482,19 +480,34 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (request.status === 200) {
-                    statusMessage.textContent = successMessage;
+                    outputData();
                 } else {
-                    statusMessage.textContent = errorMessage;
+                    errorData(request.status);
                 }
             });
 
             request.open('POST', './server.php');
             request.setRequestHeader('Content-Type', 'application/json');
-            const formData = new FormData(form);
 
-            const body = {};
-            formData.forEach((v, k) => body[k] = v);
             request.send(JSON.stringify(body));
+        };
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(form),
+                body = {};
+            formData.forEach((v, k) => body[k] = v);
+            form.append(statusMessage);
+            postData(body,
+                () => {
+                    statusMessage.textContent = successMessage;
+                },
+                error => {
+
+                    statusMessage.textContent = errorMessage;
+                    console.log(error);
+                }
+            );
         });
 
     };
