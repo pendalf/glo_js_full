@@ -461,13 +461,11 @@ window.addEventListener('DOMContentLoaded', () => {
     // send-ajax-form
     const sendForm = selector => {
         const errorMessage = `Что то пошло не так...`,
-            loadMessage = 'Загрузка....',
             successMessage = 'Спасибо! Мы скоро с вами свяжемся!';
 
         const form = document.querySelector(selector);
 
         const statusMessage = document.createElement('div');
-        statusMessage.textContent = successMessage;
         statusMessage.style.cssText = `font-size: 2rem; ${selector === '#form3' ? 'color: #ffffff;' : ''}`;
 
         const postData = (body, outputData, errorData) => {
@@ -499,7 +497,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 body = {};
             formData.forEach((v, k) => body[k] = v);
             form.append(statusMessage);
-            statusMessage.textContent = loadMessage;
+            statusMessage.innerHTML = loadMessage;
 
             postData(body,
                 () => {
@@ -513,6 +511,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             );
         });
+
+        const getLoader = () => {
+            let loader = '<div class="sk-circle-bounce">';
+            [...Array(12)].forEach((e, i) => loader += `<div class="sk-child sk-circle-${i + 1}"></div>`);
+            loader += '</div>';
+            return loader;
+        };
+
+        const loadMessage = getLoader();
 
     };
     sendForm('#form1');
