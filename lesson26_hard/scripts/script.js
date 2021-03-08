@@ -459,11 +459,18 @@ window.addEventListener('DOMContentLoaded', () => {
     calc(100);
 
     // send-ajax-form
-    const sendForm = selector => {
+    const sendForm = (selector, validatorOptions = null) => {
         const errorMessage = `Что то пошло не так...`,
             successMessage = 'Спасибо! Мы скоро с вами свяжемся!';
 
+        let validator;
+
         const form = document.querySelector(selector);
+
+        if (validatorOptions) {
+            validator = new Validator(Object.assign({ selector }, validatorOptions));
+            validator.init();
+        }
 
         const statusMessage = document.createElement('div');
         statusMessage.style.cssText = `font-size: 2rem; ${selector === '#form3' ? 'color: #ffffff;' : ''}`;
@@ -491,27 +498,6 @@ window.addEventListener('DOMContentLoaded', () => {
             request.send(JSON.stringify(body));
         };
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            const formData = new FormData(form),
-                body = {};
-            formData.forEach((v, k) => body[k] = v);
-            form.append(statusMessage);
-            statusMessage.innerHTML = loadMessage;
-
-            postData(body,
-                () => {
-                    form.reset();
-                    statusMessage.textContent = successMessage;
-                },
-                error => {
-
-                    statusMessage.textContent = errorMessage;
-                    console.log(error);
-                }
-            );
-        });
-
         const getLoader = () => {
             let loader = '<div class="sk-circle-bounce">';
             [...Array(12)].forEach((e, i) => loader += `<div class="sk-child sk-circle-${i + 1}"></div>`);
@@ -519,10 +505,105 @@ window.addEventListener('DOMContentLoaded', () => {
             return loader;
         };
 
-        const loadMessage = getLoader();
+        const messageClean = (form = null, pending = 3000) => {
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                if (form && form.id === 'form3') {
+                    document.querySelector('.popup .popup-close').dispatchEvent(new Event('click', { bubbles: true }));
+                }
+
+            }, pending);
+        };
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            if (validator && validator.error.size) {
+                return;
+            }
+            const formData = new FormData(form),
+                body = {};
+            formData.forEach((v, k) => body[k] = v);
+            form.append(statusMessage);
+            statusMessage.innerHTML = getLoader();
+
+            postData(body,
+                () => {
+                    form.reset();
+                    statusMessage.textContent = successMessage;
+                    messageClean(form);
+                },
+                error => {
+
+                    statusMessage.textContent = errorMessage;
+                    messageClean();
+                    console.log(error);
+                }
+            );
+        });
 
     };
-    sendForm('#form1');
-    sendForm('#form2');
-    sendForm('#form3');
+    sendForm('#form1', {
+        pattern: {
+            phone: /^\+?\d{11,}$/,
+            userName: /^[А-Яа-яЁё ]{2,}$/
+        },
+        method: {
+            'form1-name': [
+                ['notEmpty'],
+                ['pattern', 'userName']
+            ],
+            'form1-phone': [
+                ['notEmpty'],
+                ['pattern', 'phone']
+            ],
+            'form1-email': [
+                ['notEmpty'],
+                ['pattern', 'email']
+            ]
+        }
+    });
+    sendForm('#form2', {
+        pattern: {
+            phone: /^\+?\d{11,}$/,
+            userName: /^[А-Яа-яЁё ]{2,}$/
+        },
+        method: {
+            'form2-name': [
+                ['notEmpty'],
+                ['pattern', 'userName']
+            ],
+            'form2-phone': [
+                ['notEmpty'],
+                ['pattern', 'phone']
+            ],
+            'form2-email': [
+                ['notEmpty'],
+                ['pattern', 'email']
+            ],
+            'form2-message': [
+                ['notEmpty'],
+                ['pattern', 'userName']
+            ]
+        }
+    });
+    sendForm('#form3', {
+        pattern: {
+            phone: /^\+?\d{11,}$/,
+            userName: /^[А-Яа-яЁё ]{2,}$/
+        },
+        method: {
+            'form3-name': [
+                ['notEmpty'],
+                ['pattern', 'userName']
+            ],
+            'form3-phone': [
+                ['notEmpty'],
+                ['pattern', 'phone']
+            ],
+            'form3-email': [
+                ['notEmpty'],
+                ['pattern', 'email']
+            ]
+        }
+    });
 });
