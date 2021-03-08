@@ -475,7 +475,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const statusMessage = document.createElement('div');
         statusMessage.style.cssText = `font-size: 2rem; ${selector === '#form3' ? 'color: #ffffff;' : ''}`;
 
-        const postData = (body, outputData, errorData) => {
+        const postData = (body, outputData, errorData) => new Promise((resolve, reject) => {
 
             const request = new XMLHttpRequest();
 
@@ -486,9 +486,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (request.status === 200) {
-                    outputData();
+                    resolve();
                 } else {
-                    errorData(request.status);
+                    reject(request.status);
                 }
             });
 
@@ -496,7 +496,8 @@ window.addEventListener('DOMContentLoaded', () => {
             request.setRequestHeader('Content-Type', 'application/json');
 
             request.send(JSON.stringify(body));
-        };
+
+        });
 
         const getLoader = () => {
             let loader = '<div class="sk-circle-bounce">';
@@ -526,19 +527,18 @@ window.addEventListener('DOMContentLoaded', () => {
             form.append(statusMessage);
             statusMessage.innerHTML = getLoader();
 
-            postData(body,
-                () => {
+            postData(body)
+                .then(() => {
                     form.reset();
                     statusMessage.textContent = successMessage;
                     messageClean(form);
-                },
-                error => {
+                })
+                .catch(error => {
 
                     statusMessage.textContent = errorMessage;
                     messageClean();
                     console.log(error);
-                }
-            );
+                });
         });
 
     };
