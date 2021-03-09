@@ -475,28 +475,12 @@ window.addEventListener('DOMContentLoaded', () => {
         const statusMessage = document.createElement('div');
         statusMessage.style.cssText = `font-size: 2rem; ${selector === '#form3' ? 'color: #ffffff;' : ''}`;
 
-        const postData = (body, outputData, errorData) => new Promise((resolve, reject) => {
-
-            const request = new XMLHttpRequest();
-
-            request.addEventListener('readystatechange', () => {
-
-                if (request.readyState !== 4) {
-                    return;
-                }
-
-                if (request.status === 200) {
-                    resolve();
-                } else {
-                    reject(request.status);
-                }
-            });
-
-            request.open('POST', './server.php');
-            request.setRequestHeader('Content-Type', 'application/json');
-
-            request.send(JSON.stringify(body));
-
+        const postData = body => fetch('./server.php', {
+            method: 'POST',
+            headerd: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
         });
 
         const getLoader = () => {
@@ -528,7 +512,10 @@ window.addEventListener('DOMContentLoaded', () => {
             statusMessage.innerHTML = getLoader();
 
             postData(body)
-                .then(() => {
+                .then(response => {
+                    if (response.status !== 200) {
+                        throw new Error('Status network is not 200');
+                    }
                     form.reset();
                     statusMessage.textContent = successMessage;
                     messageClean(form);
@@ -537,7 +524,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
                     statusMessage.textContent = errorMessage;
                     messageClean();
-                    console.log(error);
+                    console.error(error);
                 });
         });
 
