@@ -1,3 +1,9 @@
+import { circ, makeEaseInOut, animate } from './animate';
+
+const scrollTo = (progress, element) => {
+    window.scrollTo(0, (element.to - element.from) * progress + element.from);
+};
+
 const toggleMenu = () => {
 
     const menu = document.querySelector('menu');

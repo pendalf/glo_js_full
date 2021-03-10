@@ -1,3 +1,10 @@
+import { circ, makeEaseOut, animate } from './animate';
+
+const popupActions = function(progress, element) {
+    element.style.opacity = progress;
+    element.style.display = progress ? 'block' : 'none';
+};
+
 const togglePopup = function() {
     const popup = document.querySelector('.popup'),
         popupBtn = document.querySelectorAll('.popup-btn');
