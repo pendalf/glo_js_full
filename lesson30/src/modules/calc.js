@@ -15,9 +15,9 @@ const calc = (price = 100) => {
             int = setInterval(() => {
                 const total = Math.round(sumNow + (delta * (Date.now() - now) / time));
                 if ((delta > 0 && total <= sum) || (delta < 0 && total >= sum)) {
-                    totalValue.textContent = total;
+                    totalValue.textContent = Math.round(total);
                 } else {
-                    totalValue.textContent = sum;
+                    totalValue.textContent = Math.round(sum);
                     clearInterval(int);
                 }
             }, step);
