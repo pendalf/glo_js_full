@@ -1,4 +1,6 @@
-const dropdownList = countries => {
+import { circ, makeEaseInOut, animate } from './animate';
+
+const dropdownList = () => {
     const inputCities = document.querySelector('.input-cities'),
         label = document.querySelector('.label'),
         dropdownLists = document.querySelectorAll('.dropdown-lists__list'),
@@ -10,6 +12,8 @@ const dropdownList = countries => {
         closeButton = document.querySelector('.close-button'),
         localeList = new Map(),
         lang = 'RU';
+
+    let countries;
 
 
     // dropdownDefault.style.display = 'none';
@@ -64,7 +68,7 @@ const dropdownList = countries => {
 
     // получение плоского списка стран и городов
     const getFlatList = () => {
-        countries[lang].forEach(v => {
+        countries.forEach(v => {
             localeList.set(generateKey(), {
                 type: 'country',
                 name: v.country,
@@ -121,13 +125,22 @@ const dropdownList = countries => {
     // поиск по городам и странам
     const search = phrase => {
         const list = new Map(),
-            regexp = new RegExp(phrase, 'gi');
+            regexp = new RegExp(`(${phrase})`, 'gi');
         localeList.forEach((v, k) => {
             if (regexp.test(v.name)) {
+                v = Object.assign({}, v);
+                v.name = v.name.replace(regexp, '<b>$1</b>');
                 list.set(k, v);
             }
         });
         return list;
+    };
+
+    const scrollLeft = (progress, element) => {
+        element.style.marginLeft = -100 * progress + '%';
+    };
+    const scrollRight = (progress, element) => {
+        element.style.marginLeft = -100 * (1 - progress) + '%';
     };
 
     // сброс
@@ -138,6 +151,30 @@ const dropdownList = countries => {
         input.value = '';
         hide(closeButton);
         show(label);
+
+
+        animate({
+            element: dropdownDefault,
+            duration: 1000,
+            timing: circ,
+            draw: scrollRight
+        });
+    };
+
+    // spiner
+    const getLoader = () => {
+        let loader = '<div class="sk-circle-bounce">';
+        [...Array(12)].forEach((e, i) => loader += `<div class="sk-child sk-circle-${i + 1}"></div>`);
+        loader += '</div>';
+        return loader;
+    };
+
+    const toggleLoader = status => {
+        if (status) {
+            document.body.insertAdjacentHTML('beforeend', `<div class="spiner">${getLoader()}</div>`);
+        } else {
+            document.querySelector('.spiner').remove();
+        }
     };
 
     // слушатели
@@ -148,18 +185,25 @@ const dropdownList = countries => {
             if (target.id === 'select-cities') {
                 hide(dropdownLists);
                 show(dropdownDefault);
+                show(dropdownSelect);
             }
             // если кликнули по стране
             if (target.closest('.dropdown-lists__total-line')) {
                 const key = target.closest('.dropdown-lists__total-line').dataset.key,
                     cityes = getCityes(key);
 
-                hide(dropdownLists);
-                show(dropdownSelect);
+                // hide(dropdownLists);
+                // show(dropdownSelect);
                 dropdownSelect.innerHTML = renderList(cityes);
                 input.value = localeList.get(key).name;
                 show(closeButton);
                 hide(label);
+                animate({
+                    element: dropdownDefault,
+                    duration: 1000,
+                    timing: makeEaseInOut(circ),
+                    draw: scrollLeft
+                });
             }
             // если клискнули по копке закрыть
             if (target === closeButton) {
@@ -198,12 +242,39 @@ const dropdownList = countries => {
         });
     };
 
+    // инициализация
+    const init = () => {
+        reset();
+        handlers();
+        getFlatList();
 
-    reset();
-    handlers();
-    getFlatList();
+        dropdownDefault.innerHTML = renderList(getDefaultList());
+    };
 
-    dropdownDefault.innerHTML = renderList(getDefaultList());
+    // загрузка данных
+    const fetchtData = () => fetch(`http://localhost:3000/${lang}`)
+        .then(res => {
+            if (res.status !== 200) {
+                throw new Error('Service is unavailable!');
+            }
+            return res.json();
+        });
+
+    // получение данных
+    const getData = () => {
+        toggleLoader(true);
+        const fetch = fetchtData();
+        fetch
+            .then(res => {
+                countries = res;
+                toggleLoader(false);
+                init();
+            })
+            .catch(err => console.error(err));
+    };
+
+    getData();
+
 };
 
 export default dropdownList;
