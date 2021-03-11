@@ -9,7 +9,7 @@ import validationForms from './modules/validationForms';
 import changeImgOnHover from './modules/changeImgOnHover';
 
 // Timer
-countTimer('22 feb 2021 10:50');
+countTimer('11 mar 2021 22:50');
 
 // Меню
 toggleMenu();

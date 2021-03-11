@@ -6,11 +6,17 @@ const validationForms = () => {
         phone = document.querySelectorAll('[name="user_phone"]');
 
     const disableSymbols = (els, regExp) => {
+        let replace = '';
         if (els instanceof HTMLInputElement) {
             els = [els];
         }
+        if (regExp instanceof Array) {
+            replace = regExp[1];
+            regExp = regExp[0];
+        }
+        console.log(regExp, replace);
         els.forEach(el => {
-            el.addEventListener('input', () => el.value = el.value.replace(regExp, ''));
+            el.addEventListener('input', () => el.value = el.value.replace(regExp, replace));
             el.addEventListener('blur', () => {
                 el.value = el.value.replace(/^[ -]*|( |-)(?=\1)|[ -]*$/g, '');
                 if (el.name === 'user_name') {
@@ -30,7 +36,7 @@ const validationForms = () => {
     disableSymbols(userName, /[^А-Яа-яЁё ]/g);
     disableSymbols(cyrillic, /[^А-Яа-яЁё\d .,;:?!-]/g);
     disableSymbols(email, /[^a-z@~!\.\*\'-]/gi);
-    disableSymbols(phone, /[^\d\+]/g);
+    disableSymbols(phone, [/^((\+?\d{0,12})|.).*/g, '$2']);
 
 };
 
