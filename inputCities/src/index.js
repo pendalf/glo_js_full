@@ -1,3 +1,3 @@
 import dropdownList from './modules/dropdownList';
 
-dropdownList();
+dropdownList(data);
