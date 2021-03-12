@@ -1,4 +1,5 @@
 import { circ, makeEaseInOut, animate } from './animate';
+import cookie from './cookies';
 
 const dropdownList = () => {
     const inputCities = document.querySelector('.input-cities'),
@@ -11,9 +12,16 @@ const dropdownList = () => {
         button = document.querySelector('.button'),
         closeButton = document.querySelector('.close-button'),
         localeList = new Map(),
-        lang = 'RU';
+        countriesSettings = {
+            RU: 'Россия',
+            DE: 'Deutschland',
+            EN: 'United Kingdom'
+        };
 
-    let countries;
+
+    let countries,
+        lang,
+        cookieLang = false;
 
 
     // dropdownDefault.style.display = 'none';
@@ -68,7 +76,11 @@ const dropdownList = () => {
 
     // получение плоского списка стран и городов
     const getFlatList = () => {
-        countries.forEach(v => {
+        const priority = new Set([countriesSettings[lang]]);
+        countries.forEach(v => priority.add(v.country));
+        const priorityCountries = [...priority].map(i => countries.filter(v => v.country === i)[0]);
+
+        priorityCountries.forEach(v => {
             localeList.set(generateKey(), {
                 type: 'country',
                 name: v.country,
@@ -244,11 +256,40 @@ const dropdownList = () => {
 
     // инициализация
     const init = () => {
+        toggleLoader(false);
         reset();
         handlers();
         getFlatList();
 
         dropdownDefault.innerHTML = renderList(getDefaultList());
+    };
+
+    const setLocalstorage = list => {
+        localStorage.countries = JSON.stringify(list);
+    };
+
+    const removeLocalStorage = () => {
+        localStorage.removeItem('countries');
+    };
+
+    const promptLocale = () => {
+        const locale = prompt(`Введите пожалуйста язык: ${Object.keys(countriesSettings).join(', ')}`);
+        if (!locale || !Object.keys(countriesSettings).includes(locale.toUpperCase())) {
+            locale = promptLocale();
+        }
+        return locale.toUpperCase();
+    };
+
+    const getLocale = () => {
+        lang = cookie.get('lang');
+        if (!lang) {
+            lang = promptLocale();
+            cookie.set('lang', lang, {
+                'max-age': 3600 * 24
+            });
+        } else {
+            cookieLang = true;
+        }
     };
 
     // загрузка данных
@@ -263,14 +304,20 @@ const dropdownList = () => {
     // получение данных
     const getData = () => {
         toggleLoader(true);
-        const fetch = fetchtData();
-        fetch
-            .then(res => {
-                countries = res;
-                toggleLoader(false);
-                init();
-            })
-            .catch(err => console.error(err));
+        getLocale();
+        if (!cookieLang || !localStorage.countries) {
+            const fetch = fetchtData();
+            fetch
+                .then(res => {
+                    countries = res;
+                    setLocalstorage(res);
+                    init();
+                })
+                .catch(err => console.error(err));
+        } else {
+            countries = JSON.parse(localStorage.countries);
+            init();
+        }
     };
 
     getData();
