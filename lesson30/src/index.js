@@ -7,6 +7,7 @@ import calc from './modules/calc';
 import sendForm from './modules/sendForm';
 import validationForms from './modules/validationForms';
 import changeImgOnHover from './modules/changeImgOnHover';
+import SliderCarousel from './modules/SliderCarousel';
 
 // Timer
 countTimer('11 mar 2021 22:50');
@@ -97,3 +98,30 @@ sendForm('#form3', {
         ]
     }
 });
+
+const sliderCarousel = new SliderCarousel({
+    main: '.companies-wrapper',
+    wrap: '.companies-hor',
+    // prev: '.test-left',
+    // next: '.test-right',
+    infinity: true,
+    slidesToShow: 4,
+
+    responsive: [
+
+        {
+            breakpoint: 1024,
+            slidesToShow: 3
+        },
+        {
+            breakpoint: 768,
+            slidesToShow: 2
+        },
+        {
+            breakpoint: 576,
+            slidesToShow: 1
+        }
+    ]
+
+});
+sliderCarousel.init();

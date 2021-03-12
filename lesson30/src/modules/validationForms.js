@@ -14,7 +14,6 @@ const validationForms = () => {
             replace = regExp[1];
             regExp = regExp[0];
         }
-        console.log(regExp, replace);
         els.forEach(el => {
             el.addEventListener('input', () => el.value = el.value.replace(regExp, replace));
             el.addEventListener('blur', () => {
